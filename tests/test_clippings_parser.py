@@ -1,5 +1,7 @@
 import pytest
 from src.domain.clippings_parser import ClippingsParser
+from src.domain.entities import Book, Clipping
+from src.domain.value_objects import Title, Author, Location, Highlight
 
 @pytest.fixture
 def sample_clippings_file(tmp_path):
@@ -24,32 +26,46 @@ Another highlight text.
 
 def test_parse_clippings(sample_clippings_file):
     parser = ClippingsParser()
-    clippings = parser.parse(sample_clippings_file)
+    books = parser.parse(sample_clippings_file)
 
-    assert len(clippings) == 3
+    assert len(books) == 2
 
-    assert clippings[0]["title"] == "Book Title"
-    assert clippings[0]["author"] == "Author Name"
-    assert clippings[0]["location"] == "123-124"
-    assert clippings[0]["highlight"] == "This is a sample highlight."
+    book1 = books[0]
+    assert isinstance(book1, Book)
+    assert book1.title.value == "Book Title"
+    assert book1.author.value == "Author Name"
+    assert len(book1.clippings) == 2
 
-    assert clippings[1]["title"] == "Book Title"
-    assert clippings[1]["author"] == "Author Name"
-    assert clippings[1]["location"] == "125-126"
-    assert clippings[1]["highlight"] == "This is another highlight for the same book."
+    clipping1 = book1.clippings[0]
+    assert isinstance(clipping1, Clipping)
+    assert clipping1.title.value == "Book Title"
+    assert clipping1.author.value == "Author Name"
+    assert clipping1.location.value == "123-124"
+    assert clipping1.highlight.value == "This is a sample highlight."
 
-    assert clippings[2]["title"] == "Another Book"
-    assert clippings[2]["author"] == "Another Author"
-    assert clippings[2]["location"] == "456"
-    assert clippings[2]["highlight"] == "Another highlight text."
+    clipping2 = book1.clippings[1]
+    assert clipping2.location.value == "125-126"
+    assert clipping2.highlight.value == "This is another highlight for the same book."
+
+    book2 = books[1]
+    assert book2.title.value == "Another Book"
+    assert book2.author.value == "Another Author"
+    assert len(book2.clippings) == 1
+
+    clipping3 = book2.clippings[0]
+    assert clipping3.location.value == "456"
+    assert clipping3.highlight.value == "Another highlight text."
 
 def test_group_by_book(sample_clippings_file):
     parser = ClippingsParser()
-    clippings = parser.parse(sample_clippings_file)
-    grouped = parser.group_by_book(clippings)
+    books = parser.parse(sample_clippings_file)
 
-    assert len(grouped) == 2
-    assert "Book Title" in grouped
-    assert "Another Book" in grouped
-    assert len(grouped["Book Title"]) == 2
-    assert len(grouped["Another Book"]) == 1
+    assert len(books) == 2
+
+    book1 = books[0]
+    assert book1.title.value == "Book Title"
+    assert len(book1.clippings) == 2
+
+    book2 = books[1]
+    assert book2.title.value == "Another Book"
+    assert len(book2.clippings) == 1

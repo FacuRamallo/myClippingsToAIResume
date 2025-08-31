@@ -1,12 +1,14 @@
 import re
-from typing import List, Dict
+from typing import List
+from .entities import Clipping, Book
+from .value_objects import Title, Author, Location, CreatedAt, Highlight
 
 class ClippingsParser:
     """
     A class to parse Kindle clippings from the "My Clippings.txt" file.
     """
 
-    def parse(self, file_path: str) -> List[Dict[str, str]]:
+    def parse(self, file_path: str) -> List[Book]:
         """
         Parse the Kindle clippings file and extract highlights, notes, and bookmarks.
 
@@ -14,7 +16,7 @@ class ClippingsParser:
             file_path (str): Path to the "My Clippings.txt" file.
 
         Returns:
-            List[Dict[str, str]]: A list of dictionaries containing parsed clippings.
+            List[Book]: A list of Book objects containing parsed clippings.
         """
         clippings = []
         with open(file_path, 'r', encoding='utf-8') as file:
@@ -38,14 +40,15 @@ class ClippingsParser:
             # Extract location or other metadata
             location = self._extract_location(metadata)
 
-            clippings.append({
-                "title": title,
-                "author": author,
-                "location": location,
-                "highlight": highlight
-            })
+            clippings.append(Clipping(
+                title=Title(title),
+                author=Author(author),
+                location=Location(location),
+                created_at=CreatedAt("Unknown"),  # Placeholder for CreatedAt
+                highlight=Highlight(highlight)
+            ))
 
-        return clippings
+        return self._group_by_book(clippings)
 
     def _extract_title_author(self, title_author: str) -> tuple[str, str]:
         """
@@ -77,20 +80,24 @@ class ClippingsParser:
             return match.group(1)
         return "Unknown"
 
-    def group_by_book(self, clippings: List[Dict[str, str]]) -> Dict[str, List[Dict[str, str]]]:
+    def _group_by_book(self, clippings: List[Clipping]) -> List[Book]:
         """
-        Group clippings by book title.
+        Group clippings by book title and author.
 
         Args:
-            clippings (List[Dict[str, str]]): List of parsed clippings.
+            clippings (List[Clipping]): List of parsed clippings.
 
         Returns:
-            Dict[str, List[Dict[str, str]]]: A dictionary where keys are book titles and values are lists of clippings.
+            List[Book]: A list of Book objects.
         """
         grouped = {}
         for clipping in clippings:
-            title = clipping["title"]
-            if title not in grouped:
-                grouped[title] = []
-            grouped[title].append(clipping)
-        return grouped
+            key = (clipping.title.value, clipping.author.value)
+            if key not in grouped:
+                grouped[key] = []
+            grouped[key].append(clipping)
+
+        return [
+            Book(title=Title(key[0]), author=Author(key[1]), clippings=grouped[key])
+            for key in grouped
+        ]

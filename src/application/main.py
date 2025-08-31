@@ -2,6 +2,7 @@ import os
 from src.domain.clippings_parser import ClippingsParser
 from src.application.markdown_generator import MarkdownGenerator
 from dotenv import load_dotenv
+from src.domain.entities import Book
 
 # Load environment variables from .env file
 load_dotenv()
@@ -16,18 +17,24 @@ def generate_markdown_files(clippings_file: str, output_dir: str):
     """
     # Parse clippings
     parser = ClippingsParser()
-    clippings = parser.parse(clippings_file)
-
-    # Group clippings by book
-    grouped_clippings = parser.group_by_book(clippings)
+    books = parser.parse(clippings_file)
 
     # Initialize Markdown generator
     generator = MarkdownGenerator(output_dir)
 
     # Generate Markdown files for each book
-    for book_title, highlights in grouped_clippings.items():
-        author = highlights[0]['author']  # Assume all highlights have the same author
-        generator.generate_markdown(book_title, author, highlights)
+    for book in books:
+        generator.generate_markdown(
+            book.title.value,
+            book.author.value,
+            [
+                {
+                    "location": clipping.location.value,
+                    "highlight": clipping.highlight.value
+                }
+                for clipping in book.clippings
+            ]
+        )
 
 def get_env_variable(var_name: str, default: str) -> str:
     """
