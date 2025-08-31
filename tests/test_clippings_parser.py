@@ -1,7 +1,5 @@
 import pytest
-from src.domain.clippings_parser import ClippingsParser
-from src.domain.entities import Book, Clipping
-from src.domain.value_objects import Title, Author, Location, Highlight
+from src.domain.clippings_parser import ClippingsParserService
 
 @pytest.fixture
 def sample_clippings_file(tmp_path):
@@ -25,47 +23,26 @@ Another highlight text.
     return file_path
 
 def test_parse_clippings(sample_clippings_file):
-    parser = ClippingsParser()
-    books = parser.parse(sample_clippings_file)
+    parser = ClippingsParserService()
+    raw_clippings = parser.parse_to_dto(sample_clippings_file)
 
-    assert len(books) == 2
+    assert len(raw_clippings) == 3
 
-    book1 = books[0]
-    assert isinstance(book1, Book)
-    assert book1.title.value == "Book Title"
-    assert book1.author.value == "Author Name"
-    assert len(book1.clippings) == 2
+    # Validate the first raw clipping
+    clipping1 = raw_clippings[0]
+    assert clipping1["title"] == "Book Title"
+    assert clipping1["author"] == "Author Name"
+    assert clipping1["location"] == "123-124"
+    assert clipping1["highlight"] == "This is a sample highlight."
 
-    clipping1 = book1.clippings[0]
-    assert isinstance(clipping1, Clipping)
-    assert clipping1.title.value == "Book Title"
-    assert clipping1.author.value == "Author Name"
-    assert clipping1.location.value == "123-124"
-    assert clipping1.highlight.value == "This is a sample highlight."
+    # Validate the second raw clipping
+    clipping2 = raw_clippings[1]
+    assert clipping2["location"] == "125-126"
+    assert clipping2["highlight"] == "This is another highlight for the same book."
 
-    clipping2 = book1.clippings[1]
-    assert clipping2.location.value == "125-126"
-    assert clipping2.highlight.value == "This is another highlight for the same book."
-
-    book2 = books[1]
-    assert book2.title.value == "Another Book"
-    assert book2.author.value == "Another Author"
-    assert len(book2.clippings) == 1
-
-    clipping3 = book2.clippings[0]
-    assert clipping3.location.value == "456"
-    assert clipping3.highlight.value == "Another highlight text."
-
-def test_group_by_book(sample_clippings_file):
-    parser = ClippingsParser()
-    books = parser.parse(sample_clippings_file)
-
-    assert len(books) == 2
-
-    book1 = books[0]
-    assert book1.title.value == "Book Title"
-    assert len(book1.clippings) == 2
-
-    book2 = books[1]
-    assert book2.title.value == "Another Book"
-    assert len(book2.clippings) == 1
+    # Validate the third raw clipping
+    clipping3 = raw_clippings[2]
+    assert clipping3["title"] == "Another Book"
+    assert clipping3["author"] == "Another Author"
+    assert clipping3["location"] == "456"
+    assert clipping3["highlight"] == "Another highlight text."
