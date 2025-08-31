@@ -8,9 +8,9 @@ class ClippingsParserService:
     A service to parse Kindle clippings from the "My Clippings.txt" file.
     """
 
-    def parse_to_entities(self, file_content: str) -> List[Book]:
+    def parse_to_books(self, file_content: str) -> List[Book]:
         """
-        Parse the Kindle clippings content and return domain entities.
+        Parse the Kindle clippings content and return domain Book entities.
 
         Args:
             file_content (str): The content of the "My Clippings.txt" file as a string.
