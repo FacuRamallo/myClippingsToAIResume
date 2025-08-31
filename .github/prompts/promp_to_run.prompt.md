@@ -8,12 +8,11 @@ You are a senior software engineer with expertise in developing and executing co
 
 # GOAL
 Refactor the file #GenerateMarkdownFilesFromClippings 
-1. It shoud be instantiated with the following parameters:
-    1.1 output_dir
-    1.2 input_file_path
-    1.3 file_reader
-    1.4 file_writer
-2. It should have a single public method called execute that will:
-    2.1 Read the input file using the file_reader
-    2.2 Process the content to generate markdown files
-    2.3 Write the output files to the output_dir using the file_writer
+1. Move the logic included in methods:
+    1.1 _sanitize_filename(self, name: str) -> str
+    1.2 _create_markdown_content(self, book_title: str, author: str, highlights: List[dict]) -> str
+    1.3 _format_to_markdown_list(self, input_text: str) -> str
+into a new class called MarkdownBookFormatter with a method format that receives a Book entity and returns the formatted markdown content inside the infrastructure layer.
+2. Update the GenerateMarkdownFilesFromClippings class to only execute fileWriter().write() where the content will be a Book entity with the domain content content.
+3. The write method implementation will handle the book formatting before writing the content.
+4. Update the tests to cover the new behavior and ensure that the MarkdownBookFormatter is used correctly.

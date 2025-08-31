@@ -28,22 +28,4 @@ class LocalFileWriter(FileWriter):
         with open(file_path, 'w', encoding='utf-8') as file:
             file.write(content)
 
-def format_to_markdown_list(input_text: str) -> str:
-    """
-    Convert a string with bullet points into a Markdown list.
-
-    Args:
-        input_text (str): The input string containing bullet points.
-
-    Returns:
-        str: The formatted Markdown list.
-    """
-    # Regular expression to match bullet points starting with "•"
-    bullet_pattern = r"•\s*([^•]+)"
-
-    # Replace bullet points with Markdown list items
-    formatted_text = re.sub(bullet_pattern, r"- \1", input_text)
-
-    return formatted_text
-
 
