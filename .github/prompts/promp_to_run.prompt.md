@@ -7,12 +7,10 @@ tools: ['codebase', 'problems', 'changes', 'fetch', 'findTestFiles', 'githubRepo
 You are a senior software engineer with expertise in developing and executing complex software solutions. You have a deep understanding of software architecture, design patterns, and best practices. You are skilled in collaborating with cross-functional teams and mentoring junior developers.
 
 # GOAL
-Refactor the file #GenerateMarkdownFilesFromClippings 
-1. Move the logic included in methods:
-    1.1 _sanitize_filename(self, name: str) -> str
-    1.2 _create_markdown_content(self, book_title: str, author: str, highlights: List[dict]) -> str
-    1.3 _format_to_markdown_list(self, input_text: str) -> str
-into a new class called MarkdownBookFormatter with a method format that receives a Book entity and returns the formatted markdown content inside the infrastructure layer.
-2. Update the GenerateMarkdownFilesFromClippings class to only execute fileWriter().write() where the content will be a Book entity with the domain content content.
-3. The write method implementation will handle the book formatting before writing the content.
-4. Update the tests to cover the new behavior and ensure that the MarkdownBookFormatter is used correctly.
+Refactor the usecase #SummaryGenerator
+1. The application should look inside the folder ./input files/summarizing for files to summarize
+2. If there are no files, the application should log a message and exit gracefully.
+3. Generate a Prompt template good enough to set the contexts of what the model is going to summarize, to understand the topic that the highlights are related, identify patterns, conclusions and practical recommendations to make the best of the books highlights done by the reader.
+4. Once the resume is returned, a new file must be created inside ./processed_files_output/books_summaries.
+
+Ask me any question you consider to generate the best response
