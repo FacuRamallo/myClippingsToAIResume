@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import List
 from .value_objects import Title, Author, Location, CreatedAt, Highlight
 
-@dataclass
+@dataclass(frozen=True)
 class Clipping:
     title: Title
     author: Author
@@ -10,7 +10,7 @@ class Clipping:
     created_at: CreatedAt
     highlight: Highlight
 
-@dataclass
+@dataclass(frozen=True)
 class Book:
     title: Title
     author: Author
